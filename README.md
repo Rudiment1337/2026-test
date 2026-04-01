@@ -1,7 +1,2 @@
-# 2026-test
-ss -akw
-awdk
-ffkk
-start
-kakd
+# 2026
 test
