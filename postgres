@@ -1,0 +1,7 @@
+sudo -u postgres psql
+CREATE DATABASE bus_monitor;
+CREATE USER bus_user WITH PASSWORD '13371337';
+GRANT ALL PRIVILEGES ON DATABASE bus_monitor TO bus_user;
+\q
+#Импорт
+sudo -u postgres psql -d bus_monitor < init.sql
