@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sens_data", indexes = {
-    @Index(name = "id_bus_time", columnList = "bus_id, time"),
-    @Index(name = "id_time", columnList = "time")
+    @Index(name = "id_bus_time", columnList = "bus_id, timestamp"),
+    @Index(name = "id_timestamp", columnList = "timestamp")
 })
 @Data
 public class SensorData {
@@ -26,6 +26,6 @@ public class SensorData {
     @Column(nullable = false)
     private Double value;
     @Column(nullable = false)
-    private LocalDateTime time;
+    private LocalDateTime timestamp;
     private boolean anomaly;
 }
