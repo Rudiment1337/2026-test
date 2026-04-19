@@ -1,12 +1,14 @@
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/config/JwtRequestFilter.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/model/SensorData.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/model/Bus.java
+/home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/config/SecurityConfig.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/repository/UserRepository.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/dto/AuthRequestDTO.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/repository/BusRepository.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/dto/AuthResponseDTO.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/model/Role.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/model/User.java
+/home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/controller/AuthController.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/controller/TestController.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/service/CustomUserDetailsService.java
 /home/kkm1337/KPFY/project-orig/src/main/java/com/busmonitor/controller/SensorController.java

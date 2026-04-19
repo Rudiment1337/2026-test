@@ -9,9 +9,11 @@ com/busmonitor/model/Role.class
 com/busmonitor/model/Bus.class
 com/busmonitor/repository/BusRepository.class
 com/busmonitor/model/Permission.class
+com/busmonitor/config/SecurityConfig.class
 com/busmonitor/BusMonitoringApplication.class
 com/busmonitor/repository/SensorDataRepository.class
 com/busmonitor/model/User.class
+com/busmonitor/controller/AuthController.class
 com/busmonitor/model/SensorData.class
 com/busmonitor/dto/AuthRequestDTO.class
 com/busmonitor/dto/SensorDataDTO.class
