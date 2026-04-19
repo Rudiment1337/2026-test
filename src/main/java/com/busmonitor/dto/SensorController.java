@@ -62,4 +62,28 @@ public class SensorController {
         response.put("message", String.format("Saved %d readings for bus %d", savedCount, bus.getId()));
         return ResponseEntity.ok(response);
     }
+	// Получеине последних данных
+    @GetMapping("/latest")
+    public ResponseEntity<List<SensorData>> getLatestReadings(@RequestParam Long busId) {
+        log.info("Getting latest data: {}", busId);
+        return ResponseEntity.ok(sensorDataRepository.findLatestReadingsByBus(busId));
+    }
+	// Получение истории
+    @GetMapping("/history")
+    public ResponseEntity<List<SensorData>> getHistory(
+            @RequestParam Long busId,
+            @RequestParam String from,
+            @RequestParam String to) {
+        log.info("Getting history : {} from {} to {}", busId, from, to);
+        LocalDateTime fromDate = LocalDateTime.parse(from);
+        LocalDateTime toDate = LocalDateTime.parse(to);
+        return ResponseEntity.ok(sensorDataRepository.findByBusIdAndTimestampBetweenOrderByTimestampDesc(
+            busId, fromDate, toDate));
+    }
+	// Получение данных о аномалиях
+    @GetMapping("/alerts")
+    public ResponseEntity<List<SensorData>> getAlerts() {
+        log.info("Getting all anomalies");
+        return ResponseEntity.ok(sensorDataRepository.findAllAnomalies());
+    }
 }
