@@ -72,14 +72,20 @@ AND p.permission IN ('sensor:read', 'alert:read')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO users (username, password, enabled) VALUES
-('admin', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKyBPG5H3gVWZqO', true),
-('manager', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKyBPG5H3gVWZqO', true),
-('operator', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKyBPG5H3gVWZqO', true)
+('admin', '$2b$12$KtvMzYkklj8HMprsCcws5OxhwCSYE8JBmtzaMyT.seIltI8b3fmLW', true),
+('manager', '$2b$12$KtvMzYkklj8HMprsCcws5OxhwCSYE8JBmtzaMyT.seIltI8b3fmLW', true),
+('operator', '$2b$12$idkezEtxInFRGdXFdWxuMOVPG6a7hj7T1wct4E9erc622wBthFEme', true) // nonath CAPS
+('kkm1337', '$2b$12$KtvMzYkklj8HMprsCcws5OxhwCSYE8JBmtzaMyT.seIltI8b3fmLW', true)
 ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r
 WHERE u.username = 'admin' AND r.title = 'ADMIN'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r
+WHERE u.username = 'kkm1337' AND r.title = 'ADMIN'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
@@ -92,6 +98,3 @@ SELECT u.id, r.id FROM users u, roles r
 WHERE u.username = 'operator' AND r.title = 'OPERATOR'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO buses (id, model, license_plate) VALUES
-(111, '222', '333')
-ON CONFLICT (id) DO NOTHING;
