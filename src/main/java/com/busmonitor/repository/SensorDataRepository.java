@@ -13,8 +13,7 @@ import java.util.List;
 public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
     List<SensorData> findByBusIdAndTimestampBetweenOrderByTimestampDesc(
         Long busId, LocalDateTime from, LocalDateTime to);
-    @Query("SELECT s FROM SensorData s WHERE s.bus.id = :busId AND s.timestamp = " +
-           "(SELECT MAX(s2.timestamp) FROM SensorData s2 WHERE s2.bus.id = :busId AND s2.sensorType = s.sensorType)")
+	@Query(value = "SELECT DISTINCT ON (sensor_type) * FROM sens_data WHERE bus_id = :busId ORDER BY sensor_type, timestamp DESC", nativeQuery = true)
     List<SensorData> findLatestReadingsByBus(@Param("busId") Long busId);
 
     @Query("SELECT s FROM SensorData s WHERE s.anomaly = true ORDER BY s.timestamp DESC")

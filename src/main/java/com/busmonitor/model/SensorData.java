@@ -2,21 +2,19 @@ package com.busmonitor.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "sens_data", indexes = {
-    @Index(name = "id_bus_time", columnList = "bus_id, timestamp"),
-    @Index(name = "id_timestamp", columnList = "timestamp")
-})
+@Table(name = "sens_data")
 @Data
 public class SensorData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bus_id", nullable = false)
+    @JsonIgnore
     private Bus bus;
 
     @Enumerated(EnumType.STRING)
@@ -25,6 +23,7 @@ public class SensorData {
 
     @Column(nullable = false)
     private Double value;
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
     private boolean anomaly;

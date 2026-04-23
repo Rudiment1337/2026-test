@@ -1,11 +1,12 @@
 package com.busmonitor.controller;
-
+import com.busmonitor.service.UserService;
 import com.busmonitor.model.Permission;
 import com.busmonitor.model.Role;
 import com.busmonitor.model.User;
 import com.busmonitor.repository.PermissionRepository;
 import com.busmonitor.repository.RoleRepository;
 import com.busmonitor.repository.UserRepository;
+import com.busmonitor.dto.UserResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,9 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
@@ -40,66 +44,21 @@ public class AdminController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         log.info("GET /api/admin/users - fetching all users");
-        return ResponseEntity.ok(userRepository.findAll());
-    }
+        List<UserResponseDTO> users = userService.findAll().stream()
+            .map(UserResponseDTO::fromUser)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(users);
+	}
 
     @GetMapping("/users/{id}")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         log.info("GET /api/admin/users/{} - fetching user", id);
-        return userRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/users")
-    @PreAuthorize("hasAuthority('user:create')")
-    public ResponseEntity<User> createUser(@RequestBody User user,
-                                           @RequestParam(required = false) Set<Long> roleIds) {
-        log.info("POST /api/admin/users - creating user: {}", user.getUsername());
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        if (roleIds != null && !roleIds.isEmpty()) {
-            Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
-            user.setRoles(roles);
-        }
-
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
-
-    @PutMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,
-                                           @RequestBody User userData,
-                                           @RequestParam(required = false) Set<Long> roleIds) {
-        log.info("PUT /api/admin/users/{} - updating user", id);
-
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (userData.getUsername() != null) {
-            user.setUsername(userData.getUsername());
-        }
-        if (userData.getPassword() != null && !userData.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userData.getPassword()));
-        }
-        if (userData.isEnabled() != user.isEnabled()) {
-            user.setEnabled(userData.isEnabled());
-        }
-        if (roleIds != null) {
-            Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
-            user.setRoles(roles);
-        }
-
-        User updatedUser = userRepository.save(user);
-        return ResponseEntity.ok(updatedUser);
-    }
+        User user = userService.findById(id);
+        return ResponseEntity.ok(UserResponseDTO.fromUser(user));
+	}
 
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasAuthority('user:delete')")

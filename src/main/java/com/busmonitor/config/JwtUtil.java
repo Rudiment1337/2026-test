@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -48,8 +50,12 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
+    	Map<String, Object> claims = new HashMap<>();
+	List<String> authorities = userDetails.getAuthorities().stream()
+		.map(auth -> auth.getAuthority())
+		.collect(Collectors.toList());
+	claims.put("authorities", authorities);
+    return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

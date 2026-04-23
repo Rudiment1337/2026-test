@@ -1,7 +1,7 @@
 package com.busmonitor.model;
 
 public enum SensorType {
-    temp_lever("temp_level", 70.0, 100.0, 115.0),
+    temp_level("temp_level", 70.0, 100.0, 115.0),
     pressure("pressure", 2.2, 3.5, 4.0),
     fuel_level("fuel_level", 40.0, 99.0, 99.0),
     speed("speed", 0.0, 90.0, 110.0);

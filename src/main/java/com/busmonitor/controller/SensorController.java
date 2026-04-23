@@ -1,5 +1,5 @@
 package com.busmonitor.controller;
-
+import com.busmonitor.dto.SensorDataResponseDTO;
 import com.busmonitor.dto.SensorDataDTO;
 import com.busmonitor.model.Bus;
 import com.busmonitor.model.SensorData;
@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +37,8 @@ public class SensorController {
             .orElseGet(() -> {
                 Bus newBus = new Bus();
                 newBus.setId(data.getBusId());
+                newBus.setLicensePlate("BUS-" + data.getBusId());
                 newBus.setModel("Unknown");
-                newBus.setTnumber("BUS-" + data.getBusId());
                 return busRepository.save(newBus);
             });
 
@@ -65,26 +66,36 @@ public class SensorController {
     }
 	// Получеине последних данных
     @GetMapping("/latest")
-    public ResponseEntity<List<SensorData>> getLatestReadings(@RequestParam Long busId) {
+    public ResponseEntity<List<SensorDataResponseDTO>> getLatestReadings(@RequestParam Long busId) {
         log.info("Getting latest data: {}", busId);
-        return ResponseEntity.ok(sensorDataRepository.findLatestReadingsByBus(busId));
+        List<SensorDataResponseDTO> data = sensorDataRepository.findLatestReadingsByBus(busId).stream()
+            .map(SensorDataResponseDTO::fromSensorData)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(data);
     }
 	// Получение истории
     @GetMapping("/history")
-    public ResponseEntity<List<SensorData>> getHistory(
+    public ResponseEntity<List<SensorDataResponseDTO>> getHistory(
             @RequestParam Long busId,
             @RequestParam String from,
             @RequestParam String to) {
-        log.info("Getting history : {} from {} to {}", busId, from, to);
+        log.info("Getting history: {} from {} to {}", busId, from, to);
         LocalDateTime fromDate = LocalDateTime.parse(from);
         LocalDateTime toDate = LocalDateTime.parse(to);
-        return ResponseEntity.ok(sensorDataRepository.findByBusIdAndTimestampBetweenOrderByTimestampDesc(
-            busId, fromDate, toDate));
-    }
+        List<SensorDataResponseDTO> data = sensorDataRepository
+             .findByBusIdAndTimestampBetweenOrderByTimestampDesc(busId, fromDate, toDate)
+            .stream()
+            .map(SensorDataResponseDTO::fromSensorData)
+            .collect(Collectors.toList());
+         return ResponseEntity.ok(data);
+     }
 	// Получение данных о аномалиях
     @GetMapping("/alerts")
-    public ResponseEntity<List<SensorData>> getAlerts() {
+    public ResponseEntity<List<SensorDataResponseDTO>> getAlerts() {
         log.info("Getting all anomalies");
-        return ResponseEntity.ok(sensorDataRepository.findAllAnomalies());
+        List<SensorDataResponseDTO> data = sensorDataRepository.findAllAnomalies().stream()
+            .map(SensorDataResponseDTO::fromSensorData)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(data);
     }
 }
