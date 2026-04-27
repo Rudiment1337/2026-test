@@ -6,6 +6,7 @@ import com.busmonitor.model.SensorData;
 import com.busmonitor.model.SensorType;
 import com.busmonitor.repository.BusRepository;
 import com.busmonitor.repository.SensorDataRepository;
+import com.busmonitor.telegram.TelegramBotService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/sens")
 public class SensorController {
+
+    @Autowired
+    private TelegramBotService telegramBotService;
 
     @Autowired
     private SensorDataRepository sensorDataRepository;
@@ -54,6 +58,14 @@ public class SensorController {
                 sensorData.setTimestamp(data.getTimestamp());
                 sensorData.setAnomaly(reading.getValue() > sensorType.getWarningThreshold());
                 sensorDataRepository.save(sensorData);
+                if (sensorData.isAnomaly()) {
+                    telegramBotService.sendAnomalyAlert(
+                       bus.getId(),
+                       sensorType.getType(),
+                       reading.getValue(),
+                       data.getTimestamp().toString()
+                    );
+		}
                 savedCount++;
             } catch (IllegalArgumentException e) {
                 log.error("Invalid sensor type: {}", reading.getType());

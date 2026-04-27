@@ -2,6 +2,7 @@ com/busmonitor/dto/RoleResponseDTO.class
 com/busmonitor/controller/TestController.class
 com/busmonitor/dto/SensorDataResponseDTO.class
 com/busmonitor/repository/RoleRepository.class
+com/busmonitor/telegram/TelegramBotService.class
 com/busmonitor/controller/SensorController.class
 com/busmonitor/model/Bus.class
 com/busmonitor/dto/BusResponseDTO.class
