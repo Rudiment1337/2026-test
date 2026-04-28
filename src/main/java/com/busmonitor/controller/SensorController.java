@@ -1,4 +1,5 @@
 package com.busmonitor.controller;
+import com.busmonitor.service.ExportService;
 import com.busmonitor.dto.SensorDataResponseDTO;
 import com.busmonitor.dto.SensorDataDTO;
 import com.busmonitor.model.Bus;
@@ -8,20 +9,26 @@ import com.busmonitor.repository.BusRepository;
 import com.busmonitor.repository.SensorDataRepository;
 import com.busmonitor.telegram.TelegramBotService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.io.ByteArrayInputStream;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/sens")
 public class SensorController {
+
+    @Autowired
+    private ExportService exportService;
 
     @Autowired
     private TelegramBotService telegramBotService;
@@ -109,5 +116,24 @@ public class SensorController {
             .map(SensorDataResponseDTO::fromSensorData)
             .collect(Collectors.toList());
         return ResponseEntity.ok(data);
+    }
+        // Экспорт
+    @GetMapping("/export")
+    @PreAuthorize("hasAuthority('report:export')")
+    public ResponseEntity<byte[]> exportToExcel(
+            @RequestParam Long busId,
+            @RequestParam String from,
+            @RequestParam String to) {
+
+        log.info("Export data for bus: {} from {} to {}", busId, from, to);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
+        LocalDateTime toDate = LocalDateTime.parse(to, formatter);
+        ByteArrayInputStream in = exportService.exportSensorDataToExcel(busId, fromDate, toDate);
+        byte[] bytes = in.readAllBytes();
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=sensor_data_bus_" + busId + ".xlsx")
+                .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(bytes);
     }
 }
