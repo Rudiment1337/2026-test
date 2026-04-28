@@ -1,4 +1,5 @@
 com/busmonitor/service/ExportService.class
+com/busmonitor/service/ThresholdImportService.class
 com/busmonitor/dto/RoleResponseDTO.class
 com/busmonitor/controller/TestController.class
 com/busmonitor/dto/SensorDataResponseDTO.class
@@ -11,6 +12,7 @@ com/busmonitor/repository/BusRepository.class
 com/busmonitor/config/SecurityConfig.class
 com/busmonitor/BusMonitoringApplication.class
 com/busmonitor/repository/SensorDataRepository.class
+com/busmonitor/exception/GlobalExceptionHandler.class
 com/busmonitor/model/User.class
 com/busmonitor/dto/UserResponseDTO.class
 com/busmonitor/controller/AuthController.class

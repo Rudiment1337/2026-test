@@ -1,5 +1,6 @@
 package com.busmonitor.controller;
 import com.busmonitor.service.ExportService;
+import com.busmonitor.service.ThresholdImportService;
 import com.busmonitor.dto.SensorDataResponseDTO;
 import com.busmonitor.dto.SensorDataDTO;
 import com.busmonitor.model.Bus;
@@ -9,6 +10,7 @@ import com.busmonitor.repository.BusRepository;
 import com.busmonitor.repository.SensorDataRepository;
 import com.busmonitor.telegram.TelegramBotService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.io.ByteArrayInputStream;
+import jakarta.validation.Valid;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/sens")
 public class SensorController {
+
+    @Autowired
+    private ThresholdImportService thresholdImportService;
 
     @Autowired
     private ExportService exportService;
@@ -40,7 +46,7 @@ public class SensorController {
     private BusRepository busRepository;
 
     @PostMapping("/batch")
-    public ResponseEntity<Map<String, String>> receiveBatchData(@RequestBody SensorDataDTO data) {
+    public ResponseEntity<Map<String, String>> receiveBatchData(@Valid @RequestBody SensorDataDTO data) {
         log.info("Received data for busId: {}", data.getBusId());
 
         // Поиск или создание автобуса
@@ -135,5 +141,27 @@ public class SensorController {
                 .header("Content-Disposition", "attachment; filename=sensor_data_bus_" + busId + ".xlsx")
                 .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .body(bytes);
+    }
+    @PostMapping("/upload-thresholds")
+    public ResponseEntity<Map<String, String>> uploadThresholds(@RequestParam("file") MultipartFile file) {
+        log.info("Loading thresholds CSV: {}", file.getOriginalFilename());
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "File 0"));
+        }
+
+        try {
+            thresholdImportService.importThresholdsFromCSV(file);
+            return ResponseEntity.ok(Map.of("status", "success", "message", "Thresholds updated"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    @GetMapping("/thresholds")
+    public ResponseEntity<Map<String, Double>> getThresholds() {
+        Map<String, Double> allThresholds = new HashMap<>();
+        for (SensorType type : SensorType.values()) {
+            allThresholds.put(type.getType(), thresholdImportService.getThreshold(type.getType()));
+        }
+        return ResponseEntity.ok(allThresholds);
     }
 }
