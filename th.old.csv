@@ -1,0 +1,5 @@
+sensor_type,threshold
+temp_level,70.0
+pressure,3.5
+fuel_level,40.0
+speed,90.0
