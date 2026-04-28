@@ -44,7 +44,7 @@ public class TelegramBotService {
     public void sendAnomalyAlert(Long busId, String sensorType, Double value, String timestamp) {
         log.info("Anomaly alert: bus={}, sensor={}, value={}", busId, sensorType, value);
         String message = String.format(
-                "Аномалия по машине ID: %d | Sensor: %s | Value: %.2f | Time: %s",
+                "Аномалия по индификатору: %d | Sensor: %s | Value: %.2f | Time: %s",
                 busId, sensorType, value, timestamp
         );
         sendAlert(message);
