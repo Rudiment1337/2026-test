@@ -33,7 +33,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
 
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/login", "/api/test/ping").permitAll()
+                .requestMatchers("/auth/login", "/api/test/ping",
+                    "/swagger-ui/**", "/swagger-ui.html",
+                    "/v3/api-docs/**", "/v3/api-docs",
+                    "/swagger-resources/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -64,3 +67,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+

@@ -1,3 +1,5 @@
+com/busmonitor/exception/BusNotFoundException.class
+com/busmonitor/exception/UserNotFoundException.class
 com/busmonitor/service/ExportService.class
 com/busmonitor/service/ThresholdImportService.class
 com/busmonitor/dto/RoleResponseDTO.class
@@ -7,6 +9,7 @@ com/busmonitor/repository/RoleRepository.class
 com/busmonitor/telegram/TelegramBotService.class
 com/busmonitor/controller/SensorController.class
 com/busmonitor/model/Bus.class
+com/busmonitor/config/SwaggerConfig.class
 com/busmonitor/dto/BusResponseDTO.class
 com/busmonitor/repository/BusRepository.class
 com/busmonitor/config/SecurityConfig.class
@@ -24,7 +27,9 @@ com/busmonitor/service/UserService.class
 com/busmonitor/repository/UserRepository.class
 com/busmonitor/controller/AdminController.class
 com/busmonitor/dto/SensorDataDTO$SensorReading.class
+com/busmonitor/exception/InvalidSensorDataException.class
 com/busmonitor/model/Role.class
+com/busmonitor/exception/BusMonitorException.class
 com/busmonitor/model/Permission.class
 com/busmonitor/dto/AuthRequestDTO.class
 com/busmonitor/dto/SensorDataDTO.class

@@ -2,6 +2,7 @@ package com.busmonitor.service;
 
 import com.busmonitor.model.User;
 import com.busmonitor.repository.UserRepository;
+import com.busmonitor.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -14,8 +15,8 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
-
     public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found: " + id));
+        return userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
     }
 }
