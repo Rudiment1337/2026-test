@@ -2,7 +2,7 @@
 set -x
 export LC_ALL=C
 export LANG=C
-API_URL="http://localhost:8080/api/sens/batch"
+API_URL="http://localhost:8080/api/sensors"
 API_AUTH="http://localhost:8080/auth/login"
 BUS_ID="${1:-1}"		# конструкция для выполнеия по дефолту ${$1:-default}(обрабат пустые строки(если без - то пустая строка будет считься $1))
 COUNT_VALUE=1
@@ -11,9 +11,9 @@ TOKEN=$(curl -s -X POST "$API_AUTH" \
   -d '{"username":"admin","password":"13371337"}' | grep -o '"token":"[^"]*' | cut -d'"' -f4)
 #echo $TOKEN
 gen_data() {
-    engine_temp=$(echo "scale=1; 70 + ($RANDOM % 300)/10" | bc) # temperature
-    tire_pressure=$(echo "scale=2; 2.2 + ($RANDOM % 50)/100" | bc) # давление
-    fuel_level=$(echo "scale=1; 40 + ($RANDOM % 600)/10" | bc) # уров топлива
+    engine_temp=$(echo "scale=1; 70 + ($RANDOM % 1500)/100" | bc) # temperature
+    tire_pressure=$(echo "scale=2; 2.2 + ($RANDOM % 800)/10" | bc) # давление
+    fuel_level=$(echo "scale=1; 45 + ($RANDOM % 1100)/10" | bc) # уров топлива
     (( $(echo "$fuel_level > 99" | bc -l) )) && fuel_level=99 # ((...)) раб с цифрами(если ((1)) && operat, то выполнится 1 операция, если 0 то вторая после &&
     speed=$((RANDOM % 110))	#					echo $(($(echo "44 > f" | bc -l))) = 1
     echo "$engine_temp|$tire_pressure|$fuel_level|$speed"
@@ -58,5 +58,5 @@ while true; do
 		((COUNT_VALUE++))
 		sleep 5
 	fi
-	sleep $BUS_ID
+	sleep 1
 done
