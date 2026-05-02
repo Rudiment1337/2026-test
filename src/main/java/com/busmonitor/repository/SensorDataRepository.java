@@ -26,4 +26,7 @@ public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
            "FROM SensorData s GROUP BY s.bus.id, s.sensorType")
     List<Object[]> getFleetStats();
     List<SensorData> findByTimestampBetweenOrderByTimestampDesc(LocalDateTime from, LocalDateTime to);
+    @Query("SELECT s.bus.id, s.sensorType, AVG(s.value), MIN(s.value), MAX(s.value), COUNT(s.id) " +
+       "FROM SensorData s GROUP BY s.bus.id, s.sensorType")
+    List<Object[]> getFleetStatistics();
 }
