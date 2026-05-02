@@ -9,6 +9,7 @@ import com.busmonitor.model.SensorType;
 import com.busmonitor.repository.BusRepository;
 import com.busmonitor.repository.SensorDataRepository;
 import com.busmonitor.telegram.TelegramBotService;
+import com.busmonitor.dto.AlertDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -157,5 +158,14 @@ public class SensorController {
             allThresholds.put(type.getType(), thresholdImportService.getThreshold(type.getType()));
         }
         return ResponseEntity.ok(allThresholds);
+    }
+    @GetMapping("/alerts/dto")
+    public ResponseEntity<List<AlertDTO>> getAlertsDTO() {
+        log.info("Get alerts in DTO format");
+
+        List<AlertDTO> alerts = sensorDataRepository.findAllAnomalies().stream()
+            .map(sd -> AlertDTO.fromSensorData(sd.getSensorType(), sd.getValue()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(alerts);
     }
 }

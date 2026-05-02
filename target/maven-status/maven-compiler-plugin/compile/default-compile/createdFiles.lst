@@ -21,6 +21,7 @@ com/busmonitor/dto/UserResponseDTO.class
 com/busmonitor/controller/AuthController.class
 com/busmonitor/model/SensorData.class
 com/busmonitor/service/CustomUserDetailsService.class
+com/busmonitor/dto/AlertDTO$Action.class
 com/busmonitor/config/JwtUtil.class
 com/busmonitor/dto/AuthResponseDTO.class
 com/busmonitor/service/UserService.class
@@ -31,6 +32,7 @@ com/busmonitor/exception/InvalidSensorDataException.class
 com/busmonitor/model/Role.class
 com/busmonitor/exception/BusMonitorException.class
 com/busmonitor/model/Permission.class
+com/busmonitor/dto/AlertDTO.class
 com/busmonitor/dto/AuthRequestDTO.class
 com/busmonitor/dto/SensorDataDTO.class
 com/busmonitor/repository/PermissionRepository.class
