@@ -18,4 +18,12 @@ public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
 
     @Query("SELECT s FROM SensorData s WHERE s.anomaly = true ORDER BY s.timestamp DESC")
     List<SensorData> findAllAnomalies();
+    @Query("SELECT s.bus.id, s.sensorType, AVG(s.value), MIN(s.value), MAX(s.value), COUNT(s) " +
+           "FROM SensorData s WHERE s.timestamp BETWEEN :from AND :to " +
+           "GROUP BY s.bus.id, s.sensorType")
+    List<Object[]> getFleetStats(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    @Query("SELECT s.bus.id, s.sensorType, AVG(s.value), MIN(s.value), MAX(s.value), COUNT(s) " +
+           "FROM SensorData s GROUP BY s.bus.id, s.sensorType")
+    List<Object[]> getFleetStats();
+    List<SensorData> findByTimestampBetweenOrderByTimestampDesc(LocalDateTime from, LocalDateTime to);
 }

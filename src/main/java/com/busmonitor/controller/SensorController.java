@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/sens")
+@RequestMapping("/api")
 public class SensorController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class SensorController {
     @Autowired
     private BusRepository busRepository;
 
-    @PostMapping("/batch")
+    @PostMapping("/sensors")
     public ResponseEntity<Map<String, String>> receiveBatchData(@Valid @RequestBody SensorDataDTO data) {
         log.info("Received data for busId: {}", data.getBusId());
 
@@ -90,7 +90,7 @@ public class SensorController {
         return ResponseEntity.ok(response);
     }
 	// Получеине последних данных
-    @GetMapping("/latest")
+    @GetMapping("/sensors/latest")
     public ResponseEntity<List<SensorDataResponseDTO>> getLatestReadings(@RequestParam Long busId) {
         log.info("Getting latest data: {}", busId);
         List<SensorDataResponseDTO> data = sensorDataRepository.findLatestReadingsByBus(busId).stream()
@@ -99,7 +99,7 @@ public class SensorController {
         return ResponseEntity.ok(data);
     }
 	// Получение истории
-    @GetMapping("/history")
+    @GetMapping("/sensors/history")
     public ResponseEntity<List<SensorDataResponseDTO>> getHistory(
             @RequestParam Long busId,
             @RequestParam String from,
@@ -124,21 +124,15 @@ public class SensorController {
         return ResponseEntity.ok(data);
     }
         // Экспорт
-    @GetMapping("/export")
+    @GetMapping("/dashboard/stats")
     @PreAuthorize("hasAuthority('report:export')")
-    public ResponseEntity<byte[]> exportToExcel(
-            @RequestParam Long busId,
-            @RequestParam String from,
-            @RequestParam String to) {
-
-        log.info("Export data for bus: {} from {} to {}", busId, from, to);
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-        LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
-        LocalDateTime toDate = LocalDateTime.parse(to, formatter);
-        ByteArrayInputStream in = exportService.exportSensorDataToExcel(busId, fromDate, toDate);
+    public ResponseEntity<byte[]> getDashboardStats() {
+        log.info("Getting fleet statistics for all buses");
+        ByteArrayInputStream in = exportService.exportDashboardStats();
         byte[] bytes = in.readAllBytes();
+
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=sensor_data_bus_" + busId + ".xlsx")
+                .header("Content-Disposition", "attachment; filename=fleet_stats.xlsx")
                 .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .body(bytes);
     }

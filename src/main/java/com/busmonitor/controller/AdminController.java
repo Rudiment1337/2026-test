@@ -72,6 +72,14 @@ public class AdminController {
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/users")
+    @PreAuthorize("hasAuthority('user:create')")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        log.info("POST /api/admin/users - creating user: {}", user.getUsername());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    }
 
 	// Role CURD
 
@@ -141,6 +149,60 @@ public class AdminController {
 
         roleRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/users/{userId}/roles")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<UserResponseDTO> addRoleToUser(
+            @PathVariable Long userId,
+            @RequestParam Long roleId) {
+        log.info("POST /api/admin/users/{}/roles - adding role {} to user", userId, roleId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + roleId));
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        user.getRoles().add(role);
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(UserResponseDTO.fromUser(savedUser));
+    }
+
+    @DeleteMapping("/users/{userId}/roles")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<UserResponseDTO> removeRoleFromUser(
+            @PathVariable Long userId,
+            @RequestParam Long roleId) {
+        log.info("DELETE /api/admin/users/{}/roles - removing role {} from user", userId, roleId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + roleId));
+        if (user.getRoles() != null) {
+            user.getRoles().remove(role);
+        }
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(UserResponseDTO.fromUser(savedUser));
+    }
+    @GetMapping("/users/{userId}/permissions")
+    @PreAuthorize("hasAuthority('user:read')")
+    public ResponseEntity<Set<String>> getUserPermissions(@PathVariable Long userId) {
+        log.info("GET /api/admin/users/{}/permissions - fetching user permissions", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+
+        Set<String> permissions = new HashSet<>();
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                if (role.getPermissions() != null) {
+                    for (Permission permission : role.getPermissions()) {
+                        permissions.add(permission.getPermission());
+                    }
+                }
+            }
+        }
+        return ResponseEntity.ok(permissions);
     }
 
 	// Permis CURD
